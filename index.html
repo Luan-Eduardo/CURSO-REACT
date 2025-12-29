@@ -172,11 +172,23 @@
       )
     }
 
+
     function Calculator() {
       const [operation, setOperation] = React.useState('');
       const [result, setResult] = React.useState('');
       const [control, setControl] = React.useState('');
       const operadores = ["+", "-", "/", "*"];
+
+      function saveOperation(op, result) {
+        const history = JSON.parse(localStorage.getItem('operations')) || [];
+
+        history.unshift(`${op} = ${result}`);
+
+        localStorage.setItem('operations', JSON.stringify(history));
+
+        window.dispatchEvent(new Event('storage'));
+      }
+
 
       function Calcular(expressao) {
         const ops = {
@@ -252,6 +264,7 @@
           const parsedResult = operationResult.toString()?.replace(/\./g, ',');
           setResult(parsedResult);
           setControl("");
+          saveOperation(operation, parsedResult);
           return;
         }
 
@@ -320,19 +333,53 @@
     }
 
     function OperationHistory() {
+      const [operations, setOperations] = React.useState([]);
+
+      function loadHistory() {
+        const history = JSON.parse(localStorage.getItem('operations')) || [];
+        setOperations(history);
+      }
+
+      function clearHistory() {
+        localStorage.removeItem('operations');
+
+        window.dispatchEvent(new Event('storage'));
+      }
+
+      React.useEffect(() => {
+        loadHistory();
+
+        window.addEventListener('storage', loadHistory);
+        return () => window.removeEventListener('storage', loadHistory);
+      }, []);
+
       return (
         <Card className="w-full py-10 px-8">
-          <Text as="h1" variant="heading" className="mb-4">
-            Historico de Operações
-          </Text>
+          <div className="flex items-center justify-between mb-4">
+            <Text as="h1" variant="heading" className="mb-4 flex flex-col gap-3">
+              Histórico de Operações
+            </Text>
+
+            <button
+              onClick={clearHistory}
+              className="px-3 py-1 text-sm rounded
+                 bg-red-500 text-white hover:bg-red-600"
+            >
+              Limpar
+            </button>
+          </div>
+
 
           <ul className="flex flex-col gap-3">
-            <Text as="li">1 + 1 = 2</Text>
-            <Text as="li">3 + 1 = 4</Text>
+            {operations.map((op, index) => (
+              <li key={index}>{op}</li>
+            ))}
           </ul>
         </Card>
-      )
+      );
     }
+
+
 
     function App() {
       return (
