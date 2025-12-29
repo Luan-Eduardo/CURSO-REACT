@@ -175,24 +175,28 @@
     function Calculator() {
       const [operation, setOperation] = React.useState('');
       const [result, setResult] = React.useState('');
+      const [control, setControl] = React.useState('');
+      const operadores = ["+", "-", "/", "*"];
 
       function handleInputClick(input) {
         if (input === "C") {
           setOperation("");
           setResult("");
+          setControl('');
           return;
         }
 
         if (input === "CE") {
-          setResult("");
           setOperation(operation.slice(0, -1));
+          setControl("");
           return;
         }
 
         if (input === "=") {
-          const operationResult = (eval(operation.replace(/,/g, '.')));
+          const operationResult = eval(operation.replace(/,/g, '.'));
           const parsedResult = operationResult.toString()?.replace(/\./g, ',');
           setResult(parsedResult);
+          setControl("");
           return;
         }
 
@@ -200,16 +204,31 @@
           setOperation(isNaN(input)
             ? `${result}${input}` : input);
           setResult("");
+          setControl("");
           return;
         }
 
-        if (input === "," && !operation.endsWith(',')) {
+        if ((input === "," && !operation.endsWith(',') && !control.includes('a'))) {
+          setOperation(`${operation}${input}`);
+          setControl("a");
+          return;
+        }
+
+        if (input === "," && !control.includes('a')) {
           setOperation(`${operation},`);
           return;
         }
+
         if (input != ",") {
-          setOperation(`${operation}${input}`)
+          setOperation(`${operation}${input}`);
+          return;
         }
+
+        if (operadores.includes(input)) {
+          setControl("");
+          return;
+        }
+        setOperation(`${operation}${input.endsWith(',') ? "" : input}`);
       }
 
       return (
