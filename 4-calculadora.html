@@ -175,11 +175,14 @@
     function Calculator() {
       const [operation, setOperation] = React.useState('');
       const [result, setResult] = React.useState('');
+      const [control, setControl] = React.useState('');
+      const operadores = ["+", "-", "/", "*"];
 
       function handleInputClick(input) {
         if (input === "C") {
           setOperation("");
           setResult("");
+          setControl("");
           return;
         }
 
@@ -193,6 +196,7 @@
           const operationResult = (eval(operation.replace(/,/g, '.')));
           const parsedResult = operationResult.toString()?.replace(/\./g, ',');
           setResult(parsedResult);
+          setControl("");
           return;
         }
 
@@ -203,12 +207,24 @@
           return;
         }
 
-        if (input === "," && !operation.endsWith(',')) {
-          setOperation(`${operation},`);
+        if ((input === "," && !operation.endsWith(',') && !control.includes('a'))) {
+          setOperation(`${operation}${input}`);
+          setControl("a");
           return;
         }
-        if (input != ",") {
-          setOperation(`${operation}${input}`)
+
+        if (input === "," && !control.includes('a')) {
+          setOperation(`${operation}${input}`);
+          return;
+        }
+        if (operadores.includes(input)) {
+          setOperation(`${operation}${input}`);
+          setControl("");
+          return;
+        }
+        if (!isNaN(input)) {
+          setOperation(`${operation}${input}`);
+          return;
         }
       }
 
