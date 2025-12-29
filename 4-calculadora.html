@@ -182,18 +182,17 @@
         if (input === "C") {
           setOperation("");
           setResult("");
-          setControl('');
           return;
         }
 
         if (input === "CE") {
+          setResult("");
           setOperation(operation.slice(0, -1));
-          setControl("");
           return;
         }
 
         if (input === "=") {
-          const operationResult = eval(operation.replace(/,/g, '.'));
+          const operationResult = (eval(operation.replace(/,/g, '.')));
           const parsedResult = operationResult.toString()?.replace(/\./g, ',');
           setResult(parsedResult);
           setControl("");
@@ -204,7 +203,6 @@
           setOperation(isNaN(input)
             ? `${result}${input}` : input);
           setResult("");
-          setControl("");
           return;
         }
 
@@ -215,20 +213,18 @@
         }
 
         if (input === "," && !control.includes('a')) {
-          setOperation(`${operation},`);
-          return;
-        }
-
-        if (input != ",") {
           setOperation(`${operation}${input}`);
           return;
         }
-
         if (operadores.includes(input)) {
+          setOperation(`${operation}${input}`);
           setControl("");
           return;
         }
-        setOperation(`${operation}${input.endsWith(',') ? "" : input}`);
+        if (!isNaN(input)) {
+          setOperation(`${operation}${input}`);
+          return;
+        }
       }
 
       return (
