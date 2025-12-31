@@ -54,6 +54,23 @@
       blast: 'text-3xl'
     }
 
+    const OperationContext = React.createContext();
+
+    function OperationProvider({ children }) {
+      const [savedOperations, setSavedOperations] = React.useState([]);
+
+      function saveOperation(operation, result) {
+        const history = operation + ' = ' + result;
+        setSavedOperations((prev) => [...prev, history])
+      }
+
+      return (
+        <OperationContext.Provider value={{ savedOperations, saveOperation }}>
+          {children}
+        </OperationContext.Provider>
+      )
+    }
+
     function Text({
       as = 'span',
       variant = 'default',
@@ -177,6 +194,7 @@
       const [result, setResult] = React.useState('');
       const [control, setControl] = React.useState('');
       const operadores = ["+", "-", "/", "*"];
+      const { savedOperations, saveOperation } = React.useContext(OperationContext);
 
       function Calcular(expressao) {
         const ops = {
@@ -252,6 +270,7 @@
           const parsedResult = operationResult.toString()?.replace(/\./g, ',');
           setResult(parsedResult);
           setControl("");
+          saveOperation(operation, parsedResult);
           return;
         }
 
@@ -320,6 +339,7 @@
     }
 
     function OperationHistory() {
+      const { savedOperations } = React.useContext(OperationContext);
       return (
         <Card className="w-full py-10 px-8">
           <Text as="h1" variant="heading" className="mb-4">
@@ -327,8 +347,9 @@
           </Text>
 
           <ul className="flex flex-col gap-3">
-            <Text as="li">1 + 1 = 2</Text>
-            <Text as="li">3 + 1 = 4</Text>
+            {savedOperations.map((value, index) =>
+              <li key={`item${index}`}>{value}</li>
+            )}
           </ul>
         </Card>
       )
@@ -342,8 +363,10 @@
           items-center sm:items-stretch
           gap-2
         `}>
-          <Calculator />
-          <OperationHistory />
+          <OperationProvider>
+            <Calculator />
+            <OperationHistory />
+          </OperationProvider>
         </main>
       )
     }
