@@ -64,8 +64,12 @@
         setSavedOperations((prev) => [...prev, history])
       }
 
+      function clearOperation() {
+        setSavedOperations((prev) => [])
+      }
+
       return (
-        <OperationContext.Provider value={{ savedOperations, saveOperation }}>
+        <OperationContext.Provider value={{ savedOperations, saveOperation, clearOperation }}>
           {children}
         </OperationContext.Provider>
       )
@@ -339,15 +343,18 @@
     }
 
     function OperationHistory() {
-      const { savedOperations } = React.useContext(OperationContext);
+      const { savedOperations, clearOperation } = React.useContext(OperationContext);
+      const reversedOperations = savedOperations.reverse();
       return (
         <Card className="w-full py-10 px-8">
-          <Text as="h1" variant="heading" className="mb-4">
-            Historico de Operações
-          </Text>
-
+          <div className="flex gap-3 justify-between">
+            <Text as="h1" variant="heading" className="mb-4">
+              Historico de Operações
+            </Text>
+            <Button className="bg-red-500 text-sm" onClick={() => clearOperation()}> Limpar Histórico </Button>
+          </div>
           <ul className="flex flex-col gap-3">
-            {savedOperations.map((value, index) =>
+            {reversedOperations.map((value, index) =>
               <li key={`item${index}`}>{value}</li>
             )}
           </ul>
