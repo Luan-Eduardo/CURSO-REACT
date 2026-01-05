@@ -255,7 +255,7 @@
       }
 
 
-      function handleInputClick(input) {
+      function handleInputClick(input, inputKey) {
         if (input === "C") {
           setOperation("");
           setResult("");
@@ -353,11 +353,18 @@
             </Text>
             <Button className="bg-red-500 text-sm" onClick={() => clearOperation()}> Limpar Histórico </Button>
           </div>
-          <ul className="flex flex-col gap-3">
-            {reversedOperations.map((value, index) =>
-              <li key={`item${index}`}>{value}</li>
-            )}
-          </ul>
+          {savedOperations.length > 0 ?
+            <ul className="flex flex-col gap-3">
+
+              {reversedOperations.map((value, index) =>
+                <Text as="li" key={`item${index}`}>
+                  {value}
+                </Text>
+              )}
+            </ul>
+            :
+            <Text as="p" variant="muted">Nenhuma operação realizada.</Text>
+          }
         </Card>
       )
     }
