@@ -58,10 +58,32 @@
 
     function OperationProvider({ children }) {
       const [savedOperations, setSavedOperations] = React.useState([]);
+      const historyStorageKey = 'history';
+
+
+      React.useEffect(() => {
+        const savedHistory = localStorage.getItem(historyStorageKey);
+        setSavedOperations(JSON.parse(savedHistory || '[]'));
+      }, [])
+
+      function clearHistory() {
+        const savedHistory = localStorage.removeItem(historyStorageKey);
+        setSavedOperations(JSON.parse(savedHistory || '[]'));
+      }
 
       function saveOperation(operation, result) {
         const history = operation + ' = ' + result;
-        setSavedOperations((prev) => [...prev, history])
+        setSavedOperations((prev) => {
+          const updatedHistory = [...prev, history];
+          localStorage.setItem(
+            historyStorageKey,
+            JSON.stringify(updatedHistory)
+          );
+
+          return updatedHistory;
+        }
+        )
+
       }
 
       function clearOperation() {
@@ -69,7 +91,7 @@
       }
 
       return (
-        <OperationContext.Provider value={{ savedOperations, saveOperation, clearOperation }}>
+        <OperationContext.Provider value={{ savedOperations, saveOperation, clearHistory }}>
           {children}
         </OperationContext.Provider>
       )
@@ -343,7 +365,7 @@
     }
 
     function OperationHistory() {
-      const { savedOperations, clearOperation } = React.useContext(OperationContext);
+      const { savedOperations, clearHistory } = React.useContext(OperationContext);
       const reversedOperations = savedOperations.reverse();
       return (
         <Card className="w-full py-10 px-8">
@@ -351,7 +373,7 @@
             <Text as="h1" variant="heading" className="mb-4">
               Historico de Operações
             </Text>
-            <Button className="bg-red-500 text-sm" onClick={() => clearOperation()}> Limpar Histórico </Button>
+            <Button className="bg-red-500 text-sm" onClick={() => clearHistory()}> Limpar Histórico </Button>
           </div>
           {savedOperations.length > 0 ?
             <ul className="flex flex-col gap-3">
