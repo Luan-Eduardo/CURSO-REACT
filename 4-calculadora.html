@@ -215,12 +215,12 @@
       )
     }
 
-    function Calculator() {
+    function useCalculator() {
       const [operation, setOperation] = React.useState('');
       const [result, setResult] = React.useState('');
       const [control, setControl] = React.useState('');
-      const operadores = ["+", "-", "/", "*"];
       const { savedOperations, saveOperation } = React.useContext(OperationContext);
+      const operadores = ["+", "-", "/", "*"];
 
       function Calcular(expressao) {
         const ops = {
@@ -276,8 +276,7 @@
         return Number(calc[0].toFixed(10));
       }
 
-
-      function handleInputClick(input, inputKey) {
+      function DoOperation(input) {
         if (input === "C") {
           setOperation("");
           setResult("");
@@ -326,6 +325,21 @@
           setOperation(`${operation}${input}`);
           return;
         }
+      }
+
+      return {
+        operation,
+        result,
+        control,
+        DoOperation
+      }
+    }
+
+    function Calculator() {
+      const { operation, result, control, DoOperation } = useCalculator();
+
+      function handleInputClick(input, inputKey) {
+        DoOperation(input);
       }
 
       return (
